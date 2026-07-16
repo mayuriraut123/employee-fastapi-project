@@ -112,8 +112,6 @@ def highest_salary():
         result["_id"]=str(
             result["_id"]
         )
-
-
         return result
 
 

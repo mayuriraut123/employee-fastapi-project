@@ -48,9 +48,6 @@ def get_average_salary(
 
     return average_salary()
 
-
-
-
 @router.get("/highest-salary")
 def get_highest_salary(
     user=Depends(verify_token)
