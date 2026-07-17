@@ -1,9 +1,12 @@
 from bson import ObjectId
 
 from app.core.database import employee_collection
+from app.decorators.employee_decorator import employee_logger, exception_handler
 
 
 # Insert Employee
+@employee_logger
+@exception_handler
 def insert_employee(employee):
 
     print("Inside insert_employee()")
@@ -22,6 +25,8 @@ def insert_employee(employee):
 
 
 # Get All Employees
+@employee_logger
+@exception_handler
 def get_all_employees(
         page=1,
         limit=10,
@@ -68,6 +73,8 @@ def get_all_employees(
 
 
 # Get One Employee
+@employee_logger
+@exception_handler
 def get_employee(employee_id):
 
     print("Inside get_employee()")
@@ -96,6 +103,8 @@ def get_employee(employee_id):
 
 
 # Update Employee
+@employee_logger
+@exception_handler
 def update_employee(employee_id, employee):
 
     print("Inside update_employee()")
@@ -119,6 +128,8 @@ def update_employee(employee_id, employee):
 
 
 # Delete Employee
+@employee_logger
+@exception_handler
 def delete_employee(employee_id):
 
     print("Inside delete_employee()")
