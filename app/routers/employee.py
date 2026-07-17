@@ -1,16 +1,8 @@
 from fastapi import APIRouter, Depends
 
-
 from app.core.security import verify_token
-from app.core.roles import admin_required
-
-
 from app.schemas.employee import Employee
-from fastapi import BackgroundTasks
-
-from app.services.background_service import generate_report
-
-
+from app.decorators.employee_decorator import employee_logger
 from app.services.employee_service import (
     insert_employee,
     get_all_employees,
@@ -19,99 +11,76 @@ from app.services.employee_service import (
     delete_employee
 )
 
-
-
 router = APIRouter(
     prefix="/employees",
-    tags=["Employees"]
+    tags=["Employees"],
+    dependencies=[Depends(verify_token)]
 )
 
 
-
-
-# VIEW - ADMIN + EMPLOYEE
-
-@router.get("/")
-def read_employees(
-    user=Depends(verify_token)
-):
-
-    return get_all_employees()
-
-
-
-
-# ADD - ADMIN ONLY
-
+# POST
 @router.post("/")
-def add_employee(
-    employee:Employee,
-    user=Depends(admin_required)
+@employee_logger
+def add_employee(employee: Employee):
+    print("Request:", employee.model_dump())
+
+    response = insert_employee(employee.model_dump())
+
+    print("Response:", response)
+    return response
+
+
+# GET ALL
+@router.get("/")
+@employee_logger
+def read_employees(
+    page: int = 1,
+    limit: int = 10,
+    department: str = None
 ):
+    print(f"Request -> page={page}, limit={limit}, department={department}")
 
-    return insert_employee(
-        employee.model_dump()
-    )
+    response = get_all_employees(page, limit, department)
+
+    print("Response:", response)
+    return response
 
 
-
-
-
-# GET ONE - BOTH
-
+# GET ONE
 @router.get("/{employee_id}")
-def read_employee(
-    employee_id:str,
-    user=Depends(verify_token)
-):
+@employee_logger
+def read_employee(employee_id: str):
+    print(f"Request -> employee_id={employee_id}")
 
-    return get_employee(
-        employee_id
-    )
+    response = get_employee(employee_id)
 
-
+    print("Response:", response)
+    return response
 
 
-
-# UPDATE - ADMIN ONLY
-
+# UPDATE
 @router.put("/{employee_id}")
-def update_employee_data(
-    employee_id:str,
-    employee:Employee,
-    user=Depends(admin_required)
-):
+@employee_logger
+def update(employee_id: str, employee: Employee):
+    print(f"Request -> employee_id={employee_id}")
+    print("Updated Data:", employee.model_dump())
 
-    return update_employee(
+    response = update_employee(
         employee_id,
         employee.model_dump()
     )
 
+    print("Response:", response)
+    return response
 
 
-
-
-# DELETE - ADMIN ONLY
-
+# DELETE
 @router.delete("/{employee_id}")
-def remove_employee(
-    employee_id:str,
-    user=Depends(admin_required)
-):
+@employee_logger
+def delete(employee_id: str):
+    print(f"Request -> employee_id={employee_id}")
 
-    return delete_employee(
-        employee_id
-    )
+    response = delete_employee(employee_id)
 
-@router.post("/report")
-def create_report(
-    background_tasks: BackgroundTasks
-):
-
-    background_tasks.add_task(
-        generate_report
-    )
-
-    return {
-        "message": "Report generation started in background"
-    }
+    print("Response:", response)
+    return response
