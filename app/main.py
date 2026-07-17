@@ -5,7 +5,7 @@ from app.routers.employee import router as employee_router
 from app.routers.csv_upload import router as csv_router
 from app.routers.excel_upload import router as excel_router
 from app.routers.dashboard import router as dashboard_router
-
+from app.middleware.request_logger import request_logger
 from app.core.logger import logger
 
 
@@ -42,6 +42,7 @@ app.include_router(employee_router)
 app.include_router(csv_router)
 app.include_router(excel_router)
 app.include_router(dashboard_router)
+app.middleware("http")(request_logger)
 
 
 # -----------------------------
